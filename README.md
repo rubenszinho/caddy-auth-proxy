@@ -1,16 +1,16 @@
-# Caddy Zero Trust Auth Proxy
+# Caddy Auth Proxy
 
 A lightweight Caddy-based authentication proxy that protects upstream services with Basic Auth. Designed to run behind a TLS-terminating edge (e.g., Railway, Cloudflare) and proxy to internal services.
 
 ## Use Case
 
-Protect a private service (e.g., Data Logger Service) running on an internal network:
+Protect an internal service with basic authentication before exposing it publicly:
 
 ```
-User (HTTPS) → Railway Edge (TLS) → Caddy (Basic Auth) → Data Logger (internal:5555)
+User (HTTPS) → Edge/PaaS (TLS) → Caddy (Basic Auth) → Internal Service
 ```
 
-The upstream service has no public URL. Caddy is the only entry point and requires authentication.
+The upstream service has no public access. Caddy is the only entry point and enforces authentication.
 
 ## Features
 
@@ -21,18 +21,18 @@ The upstream service has no public URL. Caddy is the only entry point and requir
 
 ## Configuration
 
-| Environment Variable | Description                          | Example                               |
-| -------------------- | ------------------------------------ | ------------------------------------- |
-| `AUTH_USER`          | Basic auth username                  | `admin`                               |
-| `AUTH_PASS`          | Plain text password (hashed at boot) | `mysecurepassword`                    |
-| `UPSTREAM_URL`       | Backend service URL with port        | `http://flower.railway.internal:5555` |
+| Environment Variable | Description                          | Example                        | Required |
+| -------------------- | ------------------------------------ | ------------------------------ | -------- |
+| `AUTH_USER`          | Basic auth username                  | `admin`                        | Yes      |
+| `AUTH_PASS`          | Plain text password (hashed at boot) | `mysecurepassword`             | Yes      |
+| `UPSTREAM_URL`       | Backend service URL with port        | `http://backend.internal:5555` | Yes      |
 
 ## Usage
 
 ### Build
 
 ```bash
-docker build -t caddy-zero-trust .
+docker build -t caddy-auth-proxy .
 ```
 
 ### Run
@@ -43,7 +43,7 @@ docker run -d \
   -e AUTH_PASS=mysecurepassword \
   -e UPSTREAM_URL=http://your-backend:8080 \
   -p 80:80 \
-  caddy-zero-trust
+  caddy-auth-proxy
 ```
 
 ### Railway Deployment
@@ -64,4 +64,4 @@ docker run -d \
 
 See [LICENSE](LICENSE) for details.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/jPo5no?referralCode=5oF91f&utm_medium=integration&utm_source=template&utm_campaign=generic)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/caddy-auth-proxy?referralCode=5oF91f&utm_medium=integration&utm_source=template&utm_campaign=generic)
