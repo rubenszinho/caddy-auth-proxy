@@ -1,7 +1,21 @@
 :80 {
-	basic_auth /* {
+	@not_websocket {
+		not header Connection *Upgrade*
+		not header Upgrade websocket
+	}
+	basic_auth @not_websocket {
 		{$AUTH_USER} {$AUTH_PASS_HASH}
 	}
 
-	reverse_proxy {$UPSTREAM_URL}
+	@no_token {
+		path /
+		not query token=*
+	}
+	redir @no_token /?token={$AUTH_TOKEN}
+
+	reverse_proxy {$UPSTREAM_URL} {
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
 }
